@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Objects;
 
 @RestController
 @RequiredArgsConstructor
@@ -18,39 +17,33 @@ public class MovieController {
     private final MovieService movieService;
 
     @GetMapping
-    public ResponseEntity<?> getAllMovies() {
+    public ResponseEntity<List<MovieDto>> getAllMovies() {
         List<MovieDto> movies = movieService.getAllMovies();
-        if (movies.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } else {
-            return ResponseEntity.ok(movies);
-        }
+        return ResponseEntity.ok(movies);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getMovieById(@PathVariable Long id) {
+    public ResponseEntity<MovieDto> getMovieById(@PathVariable Long id) {
         MovieDto movie = movieService.getMovieById(id);
-        if (Objects.isNull(movie)) {
+        if (movie == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } else {
-            return ResponseEntity.ok(movie);
         }
+        return ResponseEntity.ok(movie);
     }
 
     @PostMapping
-    public ResponseEntity<?> createMovie(@RequestBody MovieDto movieDto) {
+    public ResponseEntity<MovieDto> createMovie(@RequestBody MovieDto movieDto) {
         MovieDto createdMovie = movieService.createMovie(movieDto);
         return new ResponseEntity<>(createdMovie, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateMovie(@PathVariable Long id, @RequestBody MovieDto movieDto) {
+    public ResponseEntity<MovieDto> updateMovie(@PathVariable Long id, @RequestBody MovieDto movieDto) {
         MovieDto updatedMovie = movieService.updateMovie(id, movieDto);
-        if (Objects.isNull(updatedMovie)) {
+        if (updatedMovie == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } else {
-            return ResponseEntity.ok(updatedMovie);
         }
+        return ResponseEntity.ok(updatedMovie);
     }
 
     @DeleteMapping("/{id}")
@@ -58,8 +51,19 @@ public class MovieController {
         boolean isDeleted = movieService.deleteMovie(id);
         if (isDeleted) {
             return new ResponseEntity<>(HttpStatus.OK);
-        } else {
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @PostMapping("/{movieId}/actors")
+    public ResponseEntity<MovieDto> addActorsToMovie(
+            @PathVariable Long movieId,
+            @RequestBody List<Long> actorIds) {
+
+        MovieDto updatedMovie = movieService.addActorsToMovie(movieId, actorIds);
+        if (updatedMovie == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+        return ResponseEntity.ok(updatedMovie);
     }
 }

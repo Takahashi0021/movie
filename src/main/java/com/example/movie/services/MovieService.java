@@ -9,4 +9,5 @@ public interface MovieService {
     MovieDto createMovie(MovieDto movieDto);
     MovieDto updateMovie(Long id, MovieDto movieDto);
     boolean deleteMovie(Long id);
+    MovieDto addActorsToMovie(Long movieId, List<Long> actorIds); // НОВЫЙ МЕТОД
 }
